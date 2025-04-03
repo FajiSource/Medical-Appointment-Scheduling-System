@@ -2,25 +2,38 @@
 #include <queue>
 #include <thread>
 #include <chrono>
+#include <iomanip>
+#define SIZE 100
 using namespace std;
 
-enum Gender
-{
-    MALE,
-    FEMALE
-};
+
 struct Patient
 {
     string name;
     int age;
     string address;
-    Gender gender;
+    int gender;
 };
 struct Schedule
 {
     Patient patient;
     bool isFinished;
     string date;
+};
+
+class Schedules
+{
+public:
+    int size = 0;
+    Schedule schedules[SIZE];
+    bool isEmpty()
+    {
+        return size <= 0;
+    }
+    void add(Schedule sched)
+    {
+        schedules[size++] = sched;
+    }
 };
 
 int main_menu();
@@ -34,7 +47,7 @@ void header(string);
 void clear_screen();
 void display_error(string error);
 
-queue<Schedule> schedules;
+Schedules schedules;
 
 int main()
 {
@@ -91,7 +104,7 @@ int main_menu()
 {
     clear_screen();
     int choice;
-    header("Menu");
+    header("Home");
     cout << "1. View Schedules" << endl;
     cout << "2. Add New Schedule" << endl;
     cout << "3. Search Schedule" << endl;
@@ -100,23 +113,49 @@ int main_menu()
     cin >> choice;
     return choice;
 }
-void display_schedules() {
+void display_schedules()
+{
     clear_screen();
     int choice;
-    queue <Schedule> schedulesCopy = schedules;
-    cout << "NAME\t\tAGE\t\tGENDER\t\tADDRESS\t\tDATE" << endl;
-    while(!schedulesCopy.empty()){
-        Schedule sched = schedulesCopy.front();
-        schedulesCopy.pop();
-        cout << sched.patient.name 
-             <<"\t" << sched.patient.age 
-             << "\t\t" << sched.patient.gender 
-             << "\t\t" << sched.patient.address
-             << "\t" << sched.date 
-             << endl;
+    header("Schedules");
+    if (!schedules.isEmpty())
+    {
+        cout << setw(30) << left << "NAME"
+             << setw(7) << left << "AGE"
+             << setw(12) << left << "GENDER"
+             << setw(20) << left << "ADDRESS"
+             << setw(18) << "DATE" << endl << endl;
+        for (int i = 0; i < schedules.size; i++)
+        {
+            cout << setw(30) << left << schedules.schedules[i].patient.name
+                 << setw(7) << left << schedules.schedules[i].patient.age
+                 << setw(12) << left << (schedules.schedules[i].patient.gender == 0 ? "MALE" : "FEMALE")
+                 << setw(20) << left << schedules.schedules[i].patient.address
+                 << setw(18) << schedules.schedules[i].date << endl;
+        }
     }
+    else
+    {
+        cout << "No Schedules." << endl;
+    }
+    cout << endl;
+    cout << "*******************" << endl;
+    cout << "1. Select Schedule" << endl;
+    cout << "2. Back" << endl;
     cout << ">> ";
     cin >> choice;
+    if (choice == 1)
+    {
+    }
+    else if (choice == 2)
+    {
+        return;
+    }
+    else
+    {
+        display_error("Invalid Choice!");
+        display_schedules();
+    }
 }
 void add_schedule()
 {
@@ -144,16 +183,17 @@ void add_schedule()
     schedule.patient.name = name;
     schedule.patient.age = age;
     schedule.patient.address = address;
-    schedule.patient.gender = gender == 0 ? MALE : FEMALE;
+    schedule.patient.gender = gender;
     schedule.isFinished = false;
     schedule.date = date;
-    schedules.push(schedule);
+    schedules.add(schedule);
 }
-void delete_schedule() {
-
+void delete_schedule()
+{
 }
 void search_schedule() {}
-bool check_date() { 
+bool check_date()
+{
     return true;
 }
 void clear_screen() { system("cls"); }
