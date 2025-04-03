@@ -34,6 +34,11 @@ public:
     {
         schedules[size++] = sched;
     }
+    void delete_schedule(int index){
+        for(int i = index - 1  ; i < SIZE - 1; i++){
+            schedules[i] = schedules[i + 1];
+        }
+    }
 };
 
 int main_menu();
