@@ -144,8 +144,17 @@ void display_schedules()
     cout << "2. Back" << endl;
     cout << ">> ";
     cin >> choice;
+    cin.ignore();
     if (choice == 1)
-    {
+    {   
+        cout << "*******************" << endl;
+        cout << "Enter Schedule Number: ";
+        cin >> choice;
+        if(choice > schedules.size || choice <= 0){
+            display_error("Invalid Schedule Number!");
+            display_schedules();
+        }
+        selected_schedule(choice);
     }
     else if (choice == 2)
     {
@@ -156,6 +165,15 @@ void display_schedules()
         display_error("Invalid Choice!");
         display_schedules();
     }
+}
+void selected_schedule(int index){
+    header("Schedule Number: " + index);
+    cout << setw(30) << left << schedules.schedules[index].patient.name
+    << setw(7) << left << schedules.schedules[index].patient.age
+    << setw(12) << left << (schedules.schedules[index].patient.gender == 0 ? "MALE" : "FEMALE")
+    << setw(20) << left << schedules.schedules[index].patient.address
+    << setw(18) << schedules.schedules[index].date << endl;
+    cout << "*******************" << endl;
 }
 void add_schedule()
 {
