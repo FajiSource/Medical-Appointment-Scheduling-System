@@ -2,10 +2,10 @@
 #include <queue>
 #include <thread>
 #include <chrono>
+#include <string>
 #include <iomanip>
 #define SIZE 100
 using namespace std;
-
 
 struct Patient
 {
@@ -34,10 +34,13 @@ public:
     {
         schedules[size++] = sched;
     }
-    void delete_schedule(int index){
-        for(int i = index - 1  ; i < SIZE - 1; i++){
+    void delete_schedule(int index)
+    {
+        for (int i = index - 1; i < size; i++)
+        {
             schedules[i] = schedules[i + 1];
         }
+        size--;
     }
 };
 
@@ -51,6 +54,7 @@ void line();
 void header(string);
 void clear_screen();
 void display_error(string error);
+void selected_schedule(int index);
 
 Schedules schedules;
 
@@ -125,14 +129,17 @@ void display_schedules()
     header("Schedules");
     if (!schedules.isEmpty())
     {
-        cout << setw(30) << left << "NAME"
+        cout << setw(6) << left << "NO."
+             << setw(30) << left << "NAME"
              << setw(7) << left << "AGE"
              << setw(12) << left << "GENDER"
              << setw(20) << left << "ADDRESS"
-             << setw(18) << "DATE" << endl << endl;
+             << setw(18) << "DATE" << endl
+             << endl;
         for (int i = 0; i < schedules.size; i++)
         {
-            cout << setw(30) << left << schedules.schedules[i].patient.name
+            cout << setw(6) << left << i + 1
+                 << setw(30) << left << schedules.schedules[i].patient.name
                  << setw(7) << left << schedules.schedules[i].patient.age
                  << setw(12) << left << (schedules.schedules[i].patient.gender == 0 ? "MALE" : "FEMALE")
                  << setw(20) << left << schedules.schedules[i].patient.address
@@ -146,39 +153,89 @@ void display_schedules()
     cout << endl;
     cout << "*******************" << endl;
     cout << "1. Select Schedule" << endl;
-    cout << "2. Back" << endl;
+    cout << "2. Filter" << endl;
+    cout << "3. Back" << endl;
     cout << ">> ";
     cin >> choice;
     cin.ignore();
-    if (choice == 1)
-    {   
+    switch (choice)
+    {
+    case 1:
         cout << "*******************" << endl;
         cout << "Enter Schedule Number: ";
         cin >> choice;
-        if(choice > schedules.size || choice <= 0){
+        if (choice > schedules.size || choice <= 0)
+        {
             display_error("Invalid Schedule Number!");
             display_schedules();
         }
         selected_schedule(choice);
-    }
-    else if (choice == 2)
-    {
+        break;
+    case 2:
+        cout << "*******************" << endl;
+
+        break;
+    case 3:
         return;
-    }
-    else
-    {
+    default:
         display_error("Invalid Choice!");
         display_schedules();
     }
 }
-void selected_schedule(int index){
-    header("Schedule Number: " + index);
-    cout << setw(30) << left << schedules.schedules[index].patient.name
-    << setw(7) << left << schedules.schedules[index].patient.age
-    << setw(12) << left << (schedules.schedules[index].patient.gender == 0 ? "MALE" : "FEMALE")
-    << setw(20) << left << schedules.schedules[index].patient.address
-    << setw(18) << schedules.schedules[index].date << endl;
+void selected_schedule(int index)
+{
+    int choice;
+    clear_screen();
+
+    header("Schedule Number: "+ to_string(index));
+    cout << setw(6) << left << "NO."
+             << setw(30) << left << "NAME"
+             << setw(7) << left << "AGE"
+             << setw(12) << left << "GENDER"
+             << setw(20) << left << "ADDRESS"
+             << setw(18) << "DATE" << endl
+             << endl;
+    cout << setw(30) << left << schedules.schedules[index - 1].patient.name
+         << setw(7) << left << schedules.schedules[index - 1].patient.age
+         << setw(12) << left << (schedules.schedules[index - 1].patient.gender == 0 ? "MALE" : "FEMALE")
+         << setw(20) << left << schedules.schedules[index - 1].patient.address
+         << setw(18) << schedules.schedules[index - 1].date << endl;
     cout << "*******************" << endl;
+    cout << "1. Delete Record" << endl;
+    cout << "2. Mark as Done" << endl;
+    cout << ">> ";
+    cin >> choice;
+    if (choice == 1)
+    {
+        cout << "Are you sure want to delete this schedule [0]NO | [1]YES? " << endl;
+        cout << ">> ";
+        cin >> choice;
+        if (choice == 0)
+        {
+            selected_schedule(index);
+        }
+        else if (choice == 1)
+        {
+            cout << "Deleting schedule..." << endl;
+            schedules.delete_schedule(index);
+            this_thread::sleep_for(chrono::seconds(1));
+            cout << "Schedule Deleted!" << endl;
+            display_schedules();
+        }
+        else
+        {
+            display_error("Invalid Choice!");
+            selected_schedule(index);
+        }
+    }
+    else if (choice == 2)
+    {
+        cout << "Marking schedule as done..." << endl;
+        schedules.schedules[index - 1].isFinished = true;
+        this_thread::sleep_for(chrono::seconds(1));
+        cout << "Schedule Marked as Done!" << endl;
+        display_schedules();
+    }
 }
 void add_schedule()
 {

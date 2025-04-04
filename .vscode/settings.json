@@ -44,6 +44,7 @@
         "xutility": "cpp",
         "queue": "cpp",
         "iomanip": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "thread": "cpp"
     }
 }
