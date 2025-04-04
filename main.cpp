@@ -31,8 +31,9 @@ public:
         return size <= 0;
     }
     void add(Schedule sched)
-    {
+    {   
         schedules[size++] = sched;
+
     }
     void delete_schedule(int index)
     {
@@ -41,6 +42,14 @@ public:
             schedules[i] = schedules[i + 1];
         }
         size--;
+    }
+    bool is_date_available(string date)
+    {
+        for (int i = 0; i < size; i++)
+        {
+            if (schedules[i].date == date) return false;
+        }
+        return true;
     }
 };
 
@@ -260,6 +269,12 @@ void add_schedule()
     cout << "** Date of Appointment **" << endl;
     cout << "Enter Date mm/dd/yyyy\t: ";
     cin >> date;
+    if(!schedules.is_date_available(date))
+    {
+        cout << "Date is already taken!" << endl;
+        this_thread::sleep_for(chrono::seconds(1));
+        add_schedule();
+    }
     schedule.patient.name = name;
     schedule.patient.age = age;
     schedule.patient.address = address;
