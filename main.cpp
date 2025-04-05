@@ -67,6 +67,7 @@ public:
 int main_menu();
 void display_schedules(Schedule scheds[]);
 void sort_by_age(Schedule scheds[]);
+bool check_date(int day, int month, int year);
 void reverse_array(Schedule scheds[]);
 void sort_by_name(Schedule scheds[]);
 void sorted_schedule(Schedule scheds[]);
@@ -496,7 +497,8 @@ void add_schedule()
     cin.ignore();
     header("Add New Schedule");
     Schedule schedule;
-    string name, address, date;
+    string name, address;
+    int day, month, year;
     int age;
     int gender;
     cout << "** Patient Information **" << endl;
@@ -512,13 +514,21 @@ void add_schedule()
     cout << endl;
     cout << "** Date of Appointment **" << endl;
     cout << "Enter Date mm/dd/yyyy\t: ";
-    cin >> date;
+    cin >>  month >> day >> year;
+    string date = to_string(month) + "/" + to_string(day) + "/" + to_string(year);
     if (!schedules.is_date_available(date))
     {
         cout << "Date is already taken!" << endl;
         this_thread::sleep_for(chrono::seconds(1));
         add_schedule();
     }
+    if (!check_date(month ,day, year))
+    {
+        cout << "Invalid Date!" << endl;
+        this_thread::sleep_for(chrono::seconds(1));
+        add_schedule();
+    }
+    
     schedule.patient.name = name;
     schedule.patient.age = age;
     schedule.patient.address = address;
@@ -629,8 +639,24 @@ void search_schedule() {
         display_schedules(schedules.schedules);
     }
 }
-bool check_date()
+bool check_date(int month ,int day,  int year)
 {
+    if (month < 1 || month > 12)
+    {
+        return false;
+    }
+    if (day < 1 || day > 31)
+    {
+        return false;
+    }
+    if (month == 2 && day > 29)
+    {
+        return false;
+    }
+    if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30)
+    {
+        return false;
+    }    
     return true;
 }
 void clear_screen() { system("cls"); }
