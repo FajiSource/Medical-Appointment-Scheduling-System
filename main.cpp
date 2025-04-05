@@ -447,6 +447,7 @@ void selected_schedule(int index)
     cout << "*******************" << endl;
     cout << "1. Delete Record" << endl;
     cout << "2. Mark as Done" << endl;
+    cout << "3. Back" << endl;
     cout << ">> ";
     cin >> choice;
     if (choice == 1)
@@ -479,6 +480,14 @@ void selected_schedule(int index)
         this_thread::sleep_for(chrono::seconds(1));
         cout << "Schedule Marked as Done!" << endl;
         display_schedules(schedules.schedules);
+    }else if (choice == 3)
+    {
+        return;
+    }
+    else
+    {
+        display_error("Invalid Choice!");
+        selected_schedule(index);
     }
 }
 void add_schedule()
@@ -571,7 +580,56 @@ void copy_array(Schedule scheds[], Schedule sorted[])
         sorted[i] = scheds[i];
     }
 }
-void search_schedule() {}
+void search_schedule() {
+    clear_screen();
+    int choice;
+    header("Search Schedule");
+    cout << "1. Search by ID" << endl;
+    cout << "2. Search by Name" << endl;
+    cout << "3. Back" << endl;
+    cout << ">> ";
+    cin >> choice;
+    if (choice > 3 || choice <= 0)
+    {
+        display_error("Invalid Search Choice!");
+        search_schedule();
+    }
+    if (choice == 1)
+    {
+        int id;
+        cout << "Enter Schedule ID: ";
+        cin >> id;
+        if (id > schedules.size || id <= 0)
+        {
+            display_error("Invalid Schedule Number!");
+            search_schedule();
+        }
+        selected_schedule(schedules.get_index_by_id(id));
+    }
+    else if (choice == 2)
+    {
+        string name;
+        cout << "Enter Patient Name: ";
+        cin.ignore();
+        getline(cin, name);
+        for (int i = 0; i < schedules.size; i++)
+        {
+            if (schedules.schedules[i].patient.name == name)
+            {
+                selected_schedule(i);
+            }
+            else
+            {
+                display_error("Schedule Not Found!");
+                search_schedule();
+            }
+        }
+    }
+    else if (choice == 3)
+    {
+        display_schedules(schedules.schedules);
+    }
+}
 bool check_date()
 {
     return true;
