@@ -31,9 +31,8 @@ public:
         return size <= 0;
     }
     void add(Schedule sched)
-    {   
+    {
         schedules[size++] = sched;
-
     }
     void delete_schedule(int index)
     {
@@ -47,14 +46,16 @@ public:
     {
         for (int i = 0; i < size; i++)
         {
-            if (schedules[i].date == date) return false;
+            if (schedules[i].date == date)
+                return false;
         }
         return true;
     }
 };
 
 int main_menu();
-void display_schedules();
+void display_schedules(Schedule scheds[]);
+void display_filtered_schedules(int size, Schedule scheds[]);
 void add_schedule();
 void delete_schedule();
 void search_schedule();
@@ -75,7 +76,7 @@ loop:
     switch (choice)
     {
     case 1:
-        display_schedules();
+        display_schedules(schedules.schedules);
         goto loop;
     case 2:
         add_schedule();
@@ -131,11 +132,13 @@ int main_menu()
     cin >> choice;
     return choice;
 }
-void display_schedules()
+void display_schedules(Schedule scheds[])
 {
     clear_screen();
     int choice;
     header("Schedules");
+    Schedule filtered_scheds[SIZE];
+    int filtered_size = 0;
     if (!schedules.isEmpty())
     {
         cout << setw(6) << left << "NO."
@@ -148,11 +151,11 @@ void display_schedules()
         for (int i = 0; i < schedules.size; i++)
         {
             cout << setw(6) << left << i + 1
-                 << setw(30) << left << schedules.schedules[i].patient.name
-                 << setw(7) << left << schedules.schedules[i].patient.age
-                 << setw(12) << left << (schedules.schedules[i].patient.gender == 0 ? "MALE" : "FEMALE")
-                 << setw(20) << left << schedules.schedules[i].patient.address
-                 << setw(18) << schedules.schedules[i].date << endl;
+                 << setw(30) << left << scheds[i].patient.name
+                 << setw(7) << left << scheds[i].patient.age
+                 << setw(12) << left << (scheds[i].patient.gender == 0 ? "MALE" : "FEMALE")
+                 << setw(20) << left << scheds[i].patient.address
+                 << setw(18) << scheds[i].date << endl;
         }
     }
     else
@@ -176,34 +179,137 @@ void display_schedules()
         if (choice > schedules.size || choice <= 0)
         {
             display_error("Invalid Schedule Number!");
-            display_schedules();
+            display_schedules(scheds);
         }
         selected_schedule(choice);
         break;
     case 2:
         cout << "*******************" << endl;
-
+        cout << "1. Filter by Date" << endl;
+        cout << "2. Filter By Gender" << endl;
+        cout << "3. Filter By Age" << endl;
+        cout << "4. Back" << endl;
+        cout << ">> ";
+        cin >> choice;
+        cin.ignore();
+        if (choice > 4 || choice <= 0)
+        {
+            display_error("Invalid Filter Choice!");
+            display_schedules(scheds);
+        }
+        if (choice == 1)
+        {
+            int day, month, year;
+            cout << "*******************" << endl;
+            cout << "Filter by Date" << endl;
+            cout << "Enter Date [mm/dd/yyyy]: ";
+            cin >> month >> day >> year;
+            string date = to_string(month) + "/" + to_string(day) + "/" + to_string(year);
+            for (int i = 0; i < schedules.size; i++)
+            {
+                if (schedules.schedules[i].date == date)
+                {
+                    filtered_scheds[filtered_size++] = schedules.schedules[i];
+                }
+            }
+            display_filtered_schedules((filtered_size), filtered_scheds);
+            break;
+        }
+        else if (choice == 2)
+        {
+            int gender;
+            cout << "*******************" << endl;
+            cout << "Fildter by Gender" << endl;
+            cout << "Enter Gender [0]MALE [1]FEMALE: ";
+            cin >> gender;
+            for (int i = 0; i < schedules.size; i++)
+            {
+                if (schedules.schedules[i].patient.gender == gender)
+                {
+                    filtered_scheds[filtered_size++] = schedules.schedules[i];
+                }
+            }
+            display_filtered_schedules((filtered_size), filtered_scheds);
+            break;
+        }
+        else if (choice == 3)
+        {
+            int age;
+            cout << "*******************" << endl;
+            cout << "Fildter by Age" << endl;
+            cout << "Enter Age : ";
+            cin >> age;
+            for (int i = 0; i < schedules.size; i++)
+            {
+                if (schedules.schedules[i].patient.age == age)
+                {
+                    filtered_scheds[filtered_size++] = schedules.schedules[i];
+                }
+            }
+            display_filtered_schedules((filtered_size), filtered_scheds);
+            break;
+        }else if (choice == 4)
+        {
+            display_schedules(scheds);
+            break;
+        }
+        else
+        {
+            display_error("Invalid Filter Choice!");
+            display_schedules(scheds);
+        }
         break;
     case 3:
         return;
     default:
         display_error("Invalid Choice!");
-        display_schedules();
+        display_schedules(scheds);
     }
 }
+void display_filtered_schedules(int size, Schedule scheds[])
+{
+    cin.ignore();
+    clear_screen();
+    char con;
+    header("Filtered Schedules");
+    cout << setw(6) << left << "NO."
+         << setw(30) << left << "NAME"
+         << setw(7) << left << "AGE"
+         << setw(12) << left << "GENDER"
+         << setw(20) << left << "ADDRESS"
+         << setw(18) << "DATE" << endl
+         << endl;
+    for (int i = 0; i < size; i++)
+    {
+        cout << setw(6) << left << i + 1
+             << setw(30) << left << scheds[i].patient.name
+             << setw(7) << left << scheds[i].patient.age
+             << setw(12) << left << (scheds[i].patient.gender == 0 ? "MALE" : "FEMALE")
+             << setw(20) << left << scheds[i].patient.address
+             << setw(18) << scheds[i].date << endl;
+    }
+    cout << endl;
+    cout << "*******************" << endl;
+    cout << "enter 1 continue..." << endl;
+    cout << ">> ";
+    cin >> con;
+    cin.ignore();
+    display_schedules(schedules.schedules);
+}
+
 void selected_schedule(int index)
 {
     int choice;
     clear_screen();
 
-    header("Schedule Number: "+ to_string(index));
+    header("Schedule Number: " + to_string(index));
     cout << setw(6) << left << "NO."
-             << setw(30) << left << "NAME"
-             << setw(7) << left << "AGE"
-             << setw(12) << left << "GENDER"
-             << setw(20) << left << "ADDRESS"
-             << setw(18) << "DATE" << endl
-             << endl;
+         << setw(30) << left << "NAME"
+         << setw(7) << left << "AGE"
+         << setw(12) << left << "GENDER"
+         << setw(20) << left << "ADDRESS"
+         << setw(18) << "DATE" << endl
+         << endl;
     cout << setw(30) << left << schedules.schedules[index - 1].patient.name
          << setw(7) << left << schedules.schedules[index - 1].patient.age
          << setw(12) << left << (schedules.schedules[index - 1].patient.gender == 0 ? "MALE" : "FEMALE")
@@ -229,7 +335,7 @@ void selected_schedule(int index)
             schedules.delete_schedule(index);
             this_thread::sleep_for(chrono::seconds(1));
             cout << "Schedule Deleted!" << endl;
-            display_schedules();
+            display_schedules(schedules.schedules);
         }
         else
         {
@@ -243,7 +349,7 @@ void selected_schedule(int index)
         schedules.schedules[index - 1].isFinished = true;
         this_thread::sleep_for(chrono::seconds(1));
         cout << "Schedule Marked as Done!" << endl;
-        display_schedules();
+        display_schedules(schedules.schedules);
     }
 }
 void add_schedule()
@@ -256,20 +362,20 @@ void add_schedule()
     int age;
     int gender;
     cout << "** Patient Information **" << endl;
-    cout << "Enter Name\t: ";
+    cout << "Enter Name\t\t: ";
     getline(cin, name);
-    cout << "Enter Age\t: ";
+    cout << "Enter Age\t\t: ";
     cin >> age;
-    cout << "Enter Gender\t: ";
+    cout << "Enter Gender [0]M [1]F\t: ";
     cin >> gender;
     cin.ignore();
-    cout << "Enter Address\t:";
+    cout << "Enter Address\t\t:";
     getline(cin, address);
     cout << endl;
     cout << "** Date of Appointment **" << endl;
     cout << "Enter Date mm/dd/yyyy\t: ";
     cin >> date;
-    if(!schedules.is_date_available(date))
+    if (!schedules.is_date_available(date))
     {
         cout << "Date is already taken!" << endl;
         this_thread::sleep_for(chrono::seconds(1));

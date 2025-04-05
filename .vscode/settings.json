@@ -45,6 +45,10 @@
         "queue": "cpp",
         "iomanip": "cpp",
         "chrono": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "deque": "cpp",
+        "format": "cpp",
+        "vector": "cpp",
+        "xtree": "cpp"
     }
 }
