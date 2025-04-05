@@ -47,7 +47,7 @@ public:
     }
     void delete_schedule(int index)
     {
-        for (int i = index - 1; i < size; i++)
+        for (int i = index; i < size; i++)
         {
             schedules[i] = schedules[i + 1];
         }
@@ -571,7 +571,6 @@ void reverse_array(Schedule scheds[])
         scheds[i] = temp[i];
     }
 }
-
 
 void copy_array(Schedule scheds[], Schedule sorted[])
 {
