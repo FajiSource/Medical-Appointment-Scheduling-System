@@ -9,6 +9,7 @@ using namespace std;
 
 struct Patient
 {
+    int id;
     string name;
     int age;
     string address;
@@ -32,7 +33,17 @@ public:
     }
     void add(Schedule sched)
     {
+        sched.patient.id = size + 1;
         schedules[size++] = sched;
+    }
+    int get_index_by_id(int id)
+    {
+        for (int i = 0; i < size; i++)
+        {
+            if (schedules[i].patient.id == id)
+                return i;
+        }
+        return -1;
     }
     void delete_schedule(int index)
     {
@@ -55,6 +66,11 @@ public:
 
 int main_menu();
 void display_schedules(Schedule scheds[]);
+void sort_by_age(Schedule scheds[]);
+void reverse_array(Schedule scheds[]);
+void sort_by_name(Schedule scheds[]);
+void sorted_schedule(Schedule scheds[]);
+void copy_array(Schedule scheds[], Schedule sorted[]);
 void display_filtered_schedules(int size, Schedule scheds[]);
 void add_schedule();
 void delete_schedule();
@@ -70,6 +86,7 @@ Schedules schedules;
 
 int main()
 {
+
     int choice;
 loop:
     choice = main_menu();
@@ -132,6 +149,57 @@ int main_menu()
     cin >> choice;
     return choice;
 }
+void sorted_schedule(Schedule scheds[])
+{   
+    int choice;
+    clear_screen();
+    header("Sorted Schedules");
+    cout << setw(6) << left << "ID"
+         << setw(30) << left << "NAME"
+         << setw(7) << left << "AGE"
+         << setw(12) << left << "GENDER"
+         << setw(20) << left << "ADDRESS"
+         << setw(18) << "DATE" << endl
+         << endl;
+    for (int i = 0; i < schedules.size; i++)
+    {
+        cout << setw(6) << left << scheds[i].patient.id
+             << setw(30) << left << scheds[i].patient.name
+             << setw(7) << left << scheds[i].patient.age
+             << setw(12) << left << (scheds[i].patient.gender == 0 ? "MALE" : "FEMALE")
+             << setw(20) << left << scheds[i].patient.address
+             << setw(18) << scheds[i].date << endl;
+    }
+    cout << endl;
+    cout << "*******************" << endl;
+    cout << "1. Ascending/Descending" << endl;
+    cout << "2. Back" << endl;
+    cout << ">> ";
+    cin >> choice;
+    cin.ignore();
+    if (choice > 2 || choice <= 0)
+    {
+        display_error("Invalid Sort Choice!");
+        sorted_schedule(scheds);
+    }
+    if (choice == 1)
+    {
+        cout << "Sorting in ascending/descending order..." << endl;
+        reverse_array(scheds);
+        this_thread::sleep_for(chrono::seconds(1));
+        cout << "Sorted in ascending/descending order!" << endl;
+        sorted_schedule(scheds);
+    }
+    else if (choice == 2)
+    {
+        display_schedules(scheds);
+    }
+    else
+    {
+        display_error("Invalid Sort Choice!");
+        sorted_schedule(scheds);
+    }
+}
 void display_schedules(Schedule scheds[])
 {
     clear_screen();
@@ -141,7 +209,7 @@ void display_schedules(Schedule scheds[])
     int filtered_size = 0;
     if (!schedules.isEmpty())
     {
-        cout << setw(6) << left << "NO."
+        cout << setw(6) << left << "ID"
              << setw(30) << left << "NAME"
              << setw(7) << left << "AGE"
              << setw(12) << left << "GENDER"
@@ -150,7 +218,7 @@ void display_schedules(Schedule scheds[])
              << endl;
         for (int i = 0; i < schedules.size; i++)
         {
-            cout << setw(6) << left << i + 1
+            cout << setw(6) << left << scheds[i].patient.id
                  << setw(30) << left << scheds[i].patient.name
                  << setw(7) << left << scheds[i].patient.age
                  << setw(12) << left << (scheds[i].patient.gender == 0 ? "MALE" : "FEMALE")
@@ -166,22 +234,25 @@ void display_schedules(Schedule scheds[])
     cout << "*******************" << endl;
     cout << "1. Select Schedule" << endl;
     cout << "2. Filter" << endl;
-    cout << "3. Back" << endl;
+    cout << "3. Sort" << endl;
+    cout << "4. Back" << endl;
     cout << ">> ";
     cin >> choice;
     cin.ignore();
+    int indx;
     switch (choice)
     {
     case 1:
         cout << "*******************" << endl;
-        cout << "Enter Schedule Number: ";
+        cout << "Enter Schedule ID: ";
         cin >> choice;
         if (choice > schedules.size || choice <= 0)
         {
             display_error("Invalid Schedule Number!");
             display_schedules(scheds);
         }
-        selected_schedule(choice);
+        indx = schedules.get_index_by_id(choice);
+        selected_schedule(indx);
         break;
     case 2:
         cout << "*******************" << endl;
@@ -248,7 +319,8 @@ void display_schedules(Schedule scheds[])
             }
             display_filtered_schedules((filtered_size), filtered_scheds);
             break;
-        }else if (choice == 4)
+        }
+        else if (choice == 4)
         {
             display_schedules(scheds);
             break;
@@ -260,6 +332,61 @@ void display_schedules(Schedule scheds[])
         }
         break;
     case 3:
+        cout << "*******************" << endl;
+        cout << "1. Sort by Date" << endl;
+        cout << "2. Sort by Name" << endl;
+        cout << "3. Sort by Age" << endl;
+        cout << "4. Back" << endl;
+        cout << ">> ";
+        cin >> choice;
+        cin.ignore();
+        if (choice > 4 || choice <= 0)
+        {
+            display_error("Invalid Sort Choice!");
+            display_schedules(scheds);
+        }
+        if (choice == 1)
+        {
+            cout << "Sorting by date..." << endl;
+            this_thread::sleep_for(chrono::seconds(1));
+            cout << "Sorted by date!" << endl;
+            sorted_schedule(scheds);
+            break;
+        }
+        else if (choice == 2)
+        {
+            Schedule sorted[SIZE];
+            copy_array(scheds, sorted);
+            sort_by_name(sorted);
+            cout << "Sorting by name..." << endl;
+            this_thread::sleep_for(chrono::seconds(1));
+            cout << "Sorted by name!" << endl;
+            sorted_schedule(sorted);
+            break;
+        }
+        else if (choice == 3)
+        {
+            Schedule sorted[SIZE];
+            copy_array(scheds, sorted);
+            sort_by_age(sorted);
+            cout << "Sorting by age..." << endl;
+            this_thread::sleep_for(chrono::seconds(1));
+            cout << "Sorted by age!" << endl;
+            sorted_schedule(sorted);
+            break;
+        }
+        else if (choice == 4)
+        {
+            display_schedules(scheds);
+            break;
+        }
+        else
+        {
+            display_error("Invalid Sort Choice!");
+            display_schedules(scheds);
+        }
+        break;
+    case 4:
         return;
     default:
         display_error("Invalid Choice!");
@@ -272,7 +399,7 @@ void display_filtered_schedules(int size, Schedule scheds[])
     clear_screen();
     char con;
     header("Filtered Schedules");
-    cout << setw(6) << left << "NO."
+    cout << setw(6) << left << "ID"
          << setw(30) << left << "NAME"
          << setw(7) << left << "AGE"
          << setw(12) << left << "GENDER"
@@ -281,7 +408,7 @@ void display_filtered_schedules(int size, Schedule scheds[])
          << endl;
     for (int i = 0; i < size; i++)
     {
-        cout << setw(6) << left << i + 1
+        cout << setw(6) << left << scheds[i].patient.id
              << setw(30) << left << scheds[i].patient.name
              << setw(7) << left << scheds[i].patient.age
              << setw(12) << left << (scheds[i].patient.gender == 0 ? "MALE" : "FEMALE")
@@ -303,18 +430,20 @@ void selected_schedule(int index)
     clear_screen();
 
     header("Schedule Number: " + to_string(index));
-    cout << setw(6) << left << "NO."
+    cout << setw(6) << left << "ID"
          << setw(30) << left << "NAME"
          << setw(7) << left << "AGE"
          << setw(12) << left << "GENDER"
          << setw(20) << left << "ADDRESS"
          << setw(18) << "DATE" << endl
          << endl;
-    cout << setw(30) << left << schedules.schedules[index - 1].patient.name
-         << setw(7) << left << schedules.schedules[index - 1].patient.age
-         << setw(12) << left << (schedules.schedules[index - 1].patient.gender == 0 ? "MALE" : "FEMALE")
-         << setw(20) << left << schedules.schedules[index - 1].patient.address
-         << setw(18) << schedules.schedules[index - 1].date << endl;
+    cout
+        << setw(6) << left << schedules.schedules[index].patient.id
+        << setw(30) << left << schedules.schedules[index].patient.name
+        << setw(7) << left << schedules.schedules[index].patient.age
+        << setw(12) << left << (schedules.schedules[index].patient.gender == 0 ? "MALE" : "FEMALE")
+        << setw(20) << left << schedules.schedules[index].patient.address
+        << setw(18) << schedules.schedules[index].date << endl;
     cout << "*******************" << endl;
     cout << "1. Delete Record" << endl;
     cout << "2. Mark as Done" << endl;
@@ -346,7 +475,7 @@ void selected_schedule(int index)
     else if (choice == 2)
     {
         cout << "Marking schedule as done..." << endl;
-        schedules.schedules[index - 1].isFinished = true;
+        schedules.schedules[index].isFinished = true;
         this_thread::sleep_for(chrono::seconds(1));
         cout << "Schedule Marked as Done!" << endl;
         display_schedules(schedules.schedules);
@@ -389,8 +518,58 @@ void add_schedule()
     schedule.date = date;
     schedules.add(schedule);
 }
-void delete_schedule()
+void sort_by_age(Schedule scheds[])
 {
+
+    for (int i = 0; i < schedules.size; i++)
+    {
+        for (int j = i + 1; j < schedules.size; j++)
+        {
+            if (scheds[i].patient.age > scheds[j].patient.age)
+            {
+                Schedule temp = scheds[i];
+                scheds[i] = scheds[j];
+                scheds[j] = temp;
+            }
+        }
+    }
+}
+void sort_by_name(Schedule scheds[])
+{
+    for (int i = 0; i < schedules.size; i++)
+    {
+        for (int j = i + 1; j < schedules.size; j++)
+        {
+            if (scheds[i].patient.name > scheds[j].patient.name)
+            {
+                Schedule temp = scheds[i];
+                scheds[i] = scheds[j];
+                scheds[j] = temp;
+            }
+        }
+    }
+}
+
+void reverse_array(Schedule scheds[])
+{
+    Schedule temp[SIZE];
+    for (int i = 0; i < schedules.size; i++)
+    {
+        temp[i] = scheds[schedules.size - i - 1];
+    }
+    for (int i = 0; i < schedules.size; i++)
+    {
+        scheds[i] = temp[i];
+    }
+}
+
+
+void copy_array(Schedule scheds[], Schedule sorted[])
+{
+    for (int i = 0; i < schedules.size; i++)
+    {
+        sorted[i] = scheds[i];
+    }
 }
 void search_schedule() {}
 bool check_date()
