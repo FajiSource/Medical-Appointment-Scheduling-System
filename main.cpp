@@ -22,7 +22,7 @@ struct Schedule
     string date;
 };
 
-class Schedules
+class SchedulesStorge
 {
 public:
     int size = 0;
@@ -83,7 +83,7 @@ void clear_screen();
 void display_error(string error);
 void selected_schedule(int index);
 
-Schedules schedules;
+SchedulesStorge schedules;
 
 int main()
 {
@@ -140,6 +140,7 @@ void header(string label)
 int main_menu()
 {
     clear_screen();
+
     int choice;
     header("Home");
     cout << "1. View Schedules" << endl;
@@ -148,6 +149,10 @@ int main_menu()
     cout << "4. Exit" << endl;
     cout << ">> ";
     cin >> choice;
+    if(choice <= 0 || choice > 4){
+        display_error("Invalid Choice!");
+        main_menu();
+    }
     return choice;
 }
 void sorted_schedule(Schedule scheds[])
@@ -516,6 +521,11 @@ void add_schedule()
     cout << "Enter Date mm/dd/yyyy\t: ";
     cin >>  month >> day >> year;
     string date = to_string(month) + "/" + to_string(day) + "/" + to_string(year);
+
+    if(name == "" || age <= 0 || month <= 0 || day <= 0 || year <= 0 || gender <= 0 || address == ""){
+        display_error("All fields are required!");
+        add_schedule();
+    }
     if (!schedules.is_date_available(date))
     {
         cout << "Date is already taken!" << endl;
@@ -659,7 +669,10 @@ bool check_date(int month ,int day,  int year)
     }    
     return true;
 }
+
 void clear_screen() { system("cls"); }
+
+
 void display_error(string error)
 {
     cout << "** " << error << " ** " << endl;
